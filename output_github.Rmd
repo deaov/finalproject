@@ -1,0 +1,10 @@
+---
+title: "Final Project"
+author: "Dea Oviedo"
+date: "2022-12-13"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
