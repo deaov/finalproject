@@ -9,26 +9,522 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Introduction
+```{r}
+library(haven)
+library(stringr)
+library(dplyr)
+library(tidyverse)
+library(tibble)
+library(expss)
+library(vctrs)
+library(labelled)
+library(ggpubr)
+library(lubridate) 
 
-In 2012, the Senegalese government released a 2012-2015 National Family Planning Action Plan, wherein it set ambitious goals to increase its contraceptive prevalence rate (CPR) in order to meet its health and development objectives. It identified challenges to uptake related to contraceptive availability– namely, high stock-out rates and problems with products reaching service delivery points (SDP).1 One key strategy to address these challenges was the Informed Push Model (IPM), a supply chain model where third-party logisticians were contracted to deliver family planning supplies to SDPs directly from regional storerooms, effectively by-passing district storerooms. During monthly visits to SDPs, third-party logisticians performed a stock inventory, topped off contraceptive stocks, and collected data to forecast future delivery quantities. After the intervention pilot in Dakar in 2012 nearly eliminated stockouts, the Senegalese government expanded the IPM across different districts over a 3-year period before scaling up the intervention at a national level with the help of implementation partner IntraHealth International and with funding from the Gates Foundation and MSD for Mothers.2 
+#Importing the data
+senegal_14 <- read_dta("/Users/deaoviedo/Documents/grad/classes/2 THESIS/data/Senegal 2014/SNIR70DT/SNIR70DT/SNIR70FL.DTA")
+senegal_15 <- read_dta("/Users/deaoviedo/Documents/grad/classes/2 THESIS/data/Senegal 2015/SNIR7HDT/SNIR7HFL.DTA")
+senegal_16 <- read_dta("/Users/deaoviedo/Documents/grad/classes/2 THESIS/data/Senegal 2016/SNIR7IDT/SNIR7IDT/SNIR7IFL.DTA")
+```
 
-Studies have evaluated the impact of the IPM rollout on contraceptive stockout rates and their duration, finding that it resulted in an increase in the availability of contraceptive methods in health facilities and a decrease in the duration of stockouts for intrauterine devices (IUDs) and implants.3 However, there is limited evidence on the impact of the IPM on contraceptive use. One unpublished presentation outlined that there was no impact on the national modern CPR.4 This study aims to fill the gaps in the literature by assessing the impact of the IPM on district-level modern contraceptive use among postpartum women, an important beneficiary group of family planning policies and programs given the benefits of increased birth intervals on the health of mothers and their babies.
+#Introduction
 
-The Demographic and Health Survey (DHS) collects information on women’s reproductive history through its contraceptive calendar. The contraceptive calendar is a string variable containing 80 characters (with each character representing a month), and is a retrospective account recording births, pregnancies, terminations, and contraceptive use over the 80 months preceding the survey. This information can be used to determine whether, at any given month before the survey, a respondent was within the first postpartum year, and whether she was using a modern method of contraception. Data from Senegal’s 2014, 2015 and 2016 Continuous DHS were obtained. The study sample includes women ages 15-49 who have given birth in the 5 years preceding the survey.
+In 2012, the Senegalese government implemented the Informed Push Model (IPM), a supply chain model where third-party logisticians were contracted to deliver family planning supplies to service delivery points directly from regional storerooms. After the intervention pilot in Dakar in 2012 nearly eliminated stock-outs for contraceptives, the Senegalese government decided to expand the IPM across different districts over a 3-year period before scaling up the intervention at a national level.2 
+
+While studies have found that the IPM roll-out resulted in an increase in the availability of contraceptive methods and a decrease in the duration of stock-outs, there is limited evidence on the impact of the IPM on contraceptive use.3 To help fill this gap, this work will look at trends in modern contraceptive use among postpartum women (an important beneficiary group of family planning policies and programs given the benefits of increased birth intervals on the health of mothers and their babies) before and after the IPM was implemented. Districts where the IPM was implemented prior to January 2015 will serve as the intervention districts. These districts are Dakar (Dec 2012); Kaolack and Thies (Apr 2013); Diourbel, Fatick, Kaffrine and Matam (Mar 2014); Saint-Louis (Apr 2014); and Louga (Jul 2014). Districts where the IPM was implemented after January 2015 will serve as comparison districts (Tambacounda, Kolda, Kedougou, Sedhiou and Ziguinchor).
+
+The Demographic and Health Survey (DHS) is a nationally representative survey that collects information on sociodemographic characteristics, reproduction, knowledge and use of contraception, fertility preferences, among others. The DHS collects information on women’s reproductive history through its contraceptive calendar, a string variable containing 80 characters (with each character representing a month) that provides a retrospective account recording births, pregnancies, terminations, and contraceptive use over the 80 months preceding the survey's publication (usually September of the year following data collection). This information can be used to determine whether, at any given month before the survey, a respondent was within the first postpartum year, and whether she was using a modern method of contraception. 
+
+Data from Senegal’s 2014, 2015 and 2016 Continuous DHS were obtained. The original data sets contain 3989 (2014), 3998 (2015) and 4070 (2016) variables; and n=8488 (2014), n=8851 (2015) and n=8865 (2016) observations for women ages 15-49. For this analysis, I will limit the study sample to include only respondents who have given birth in the 5 years preceding each survey (n=4584 in 2014, n=4799 in 2015 and n=4726 in 2016). The main variables that will be utilized for this analysis are individual sample weights, respondent's district of residence, and the calendar variable.
+
+```{r}
+#Generating variable for women who have given birth in the dataset (at any time)
+senegal_14$gave_birth <- as.integer(str_detect(senegal_14$vcal_1, "B"))
+senegal_15$gave_birth <- as.integer(str_detect(senegal_15$vcal_1, "B"))
+senegal_16$gave_birth <- as.integer(str_detect(senegal_16$vcal_1, "B"))
+
+#Generating weight variable
+senegal_14$wt <- senegal_14$v005/1000000
+senegal_15$wt <- senegal_15$v005/1000000
+senegal_16$wt <- senegal_16$v005/1000000
+
+#Creating separate data frames with sample of only women who have given birth in
+#5 yrs preceding survey
+d_14 <- senegal_14 |> filter(gave_birth == 1)
+d_15 <- senegal_15 |> filter(gave_birth == 1)
+d_16 <- senegal_16 |> filter(gave_birth == 1)
+
+#Viewing main variables for this analysis
+d_14 |>
+  rename(individual_weight=wt, calendar_variable = vcal_1, district = v024) |>
+  select(individual_weight, district, calendar_variable)
+
+#Names of districts in Senegal
+val_lab(d_14$v024)
+
+#A closer look at the calendar variable
+head(d_14$vcal_1)
+table(str_length(d_14$vcal_1)) #confirming variable length of 80 characters
+```
 
 
-Introduce (in words) the dataset and question (5 pts)
-1-2 key plots or tables illustrating your exploratory data analysis (10 pts)
-Description and justification of the methodology you will use in your analysis (10 pts)
+#Methodology
+The outcome variable in this analysis is the monthly rate of postpartum modern contraceptive use. I use an adapted version of the UNFPA definition of modern contraceptive methods: hormonal implants, IUDs, female and male sterilization, hormonal pills and injectables, male and female condoms, and other supply methods.5 The denominator of my outcome variable is the total number of women who were within one year of their last delivery. Among those women, the numerator is the number that are using a modern method of contraception.
+
+The methodology for this analysis will consist of string variable manipulation to check whether a respondent was within the first year postpartum within a given month (denominator) and of those, whether a respondent was using a modern method of contraception within a given month (numerator). 
+
+DESCRIBE STRING VARIABLE VALUES
+
+This will yield six different data frames, two for each survey year. One data frame will have, for each respondent, whether or not they were using a modern method of contraception at each month over the 80 months prior to the survey. Similarly, the other data frame will record, for each respondent, whether or not they were within the first year postpartum within a each month. I do this process for each survey year separately and will then join the six dataframes into two dataframes, one for postpartum observations for all survey years and the other for contraceptive use observations for all survey years. Once I've completed this step, I will calculate the postpartum contraceptive use rate for each month using the weights provided for the sampling units. I will graph these monthly rates for each district with visualizations for the month of the intervention in that district and will use smoothing to try to visualize differences in patterns/trends before and after the intervention took place. I will also plot each intervention district with the comparison districts.
+
+```{r}
+#Check whether at each row of the calendar variable the respondent was using a 
+#modern method of contraception
+data_mc_14 <- data.frame(matrix(NA,
+                             nrow = nrow(d_14),
+                             ncol = 80))
+
+data_mc_15 <- data.frame(matrix(NA,
+                             nrow = nrow(d_15),
+                             ncol = 80))
+
+data_mc_16 <- data.frame(matrix(NA,
+                             nrow = nrow(d_16),
+                             ncol = 80))
+
+    #Create a function to detect contraceptive method within a specific row "pos"
+    check_mc <- function(calendar, pos) {
+      sample_cal <- substr(calendar, pos, pos)
+      using <- as.integer(str_detect(sample_cal, "[1234567NCFEM]"))
+    }
+    
+    #Apply check_mc function to each row in the calendar variable
+    using_mc_14 <- for(i in 1:80){
+      uses <- check_mc(d_14$vcal_1, i)
+      data_mc_14[ , i] <- uses
+    }
+    
+    using_mc_15 <- for(i in 1:80){
+      uses <- check_mc(d_15$vcal_1, i)
+      data_mc_15[ , i] <- uses
+    }
+
+    using_mc_16 <- for(i in 1:80){
+      uses <- check_mc(d_16$vcal_1, i)
+      data_mc_16[ , i] <- uses
+    }
+
+
+#Check whether respondents were within 12 months postpartum at particular month
+data_pp_14 <- data.frame(matrix(NA,
+                             nrow = nrow(d_14),
+                             ncol = 80))
+
+data_pp_15 <- data.frame(matrix(NA,
+                             nrow = nrow(d_15),
+                             ncol = 80))
+
+data_pp_16 <- data.frame(matrix(NA,
+                             nrow = nrow(d_16),
+                             ncol = 80))
+
+    #Create a function to detect whether respondent was within 1yr postpartum 
+    #within a specific row "pos"
+    within_pp <- function(calendar, pos) {
+      oneyear <- substr(calendar, pos+1, pos+12)
+      str_detect(oneyear, "B")
+    }
+
+    #Function to detect and ignore blank rows at the beginning of the calendar 
+    #variable
+    blanks <- function(calendar, pos) {
+      currentmonth <- substr(calendar, pos, pos)
+      str_detect(currentmonth, "\\s")
+    }
+    
+    #Apply within_pp function to each row in the calendar variable
+    for(i in 1:80){
+      blankignore <- as.integer(blanks(d_14$vcal_1, i))
+      postpartum <- as.integer(within_pp(d_14$vcal_1, i))
+      real_pp <- ifelse(blankignore == 1, NA, postpartum)
+      data_pp_14[ , i] <- real_pp
+    }
+    
+    for(i in 1:80){
+      blankignore <- as.integer(blanks(d_15$vcal_1, i))
+      postpartum <- as.integer(within_pp(d_15$vcal_1, i))
+      real_pp <- ifelse(blankignore == 1, NA, postpartum)
+      data_pp_15[ , i] <- real_pp
+    }
+
+    for(i in 1:80){
+      blankignore <- as.integer(blanks(d_16$vcal_1, i))
+      postpartum <- as.integer(within_pp(d_16$vcal_1, i))
+      real_pp <- ifelse(blankignore == 1, NA, postpartum)
+      data_pp_16[ , i] <- real_pp
+    }
+
+#Adding region variable to dataframe
+data_mc_14$region <- d_14$v024
+data_mc_15$region <- d_15$v024
+data_mc_16$region <- d_16$v024
+
+#Adding weight variable to dataframe
+data_mc_14$wt <- d_14$wt
+data_mc_15$wt <- d_15$wt
+data_mc_16$wt <- d_16$wt
+
+#Adding ID
+data_mc_14$caseid <- d_14$caseid
+data_mc_15$caseid <- d_15$caseid
+data_mc_16$caseid <- d_16$caseid
+
+#Adding survey year
+data_mc_14$survey_year <- d_14$v007
+data_mc_15$survey_year <- d_15$v007
+data_mc_16$survey_year <- d_16$v007
+
+#Renaming column names to represent the number of months prior to September 2017
+#(the month/year the 2016 survey data were published)
+names(data_mc_14)[1:80] <- 25:104
+names(data_pp_14)[1:80] <- 25:104
+names(data_mc_15)[1:80] <- 13:92
+names(data_pp_15)[1:80] <- 13:92
+names(data_mc_16)[1:80] <- 1:80
+names(data_pp_16)[1:80] <- 1:80
+
+
+full_data_mc <- bind_rows(data_mc_16, data_mc_15, data_mc_14)
+full_data_mc <- full_data_mc |> relocate("caseid", "survey_year", "region", "wt", .after = last_col())
+names(full_data_mc)
+
+full_data_pp <- bind_rows(data_pp_16, data_pp_15, data_pp_14)
+
+
+#Creating monthly outcome var
+monthly_rate_all <- data.frame(matrix(NA,
+                                     nrow = 14,
+                                     ncol = 104))
+
+for(i in 1:104){
+  full_data_mc$numerator <- ifelse(full_data_mc[,i] == 1 & full_data_pp[,i] == 1, 1, 0)
+  full_data_mc$denominator <- full_data_pp[,i]
+  rate <- full_data_mc |> filter(denominator == 1) |> group_by(region) |> 
+    summarize(weighted.mean(numerator, wt))
+  monthly_rate_all[,i] <- rate[,2]
+}
+
+
+#restructure data
+monthly_rate_all$district <- 1:14
+monthly_rate_all <- pivot_longer(monthly_rate_all, cols=-district)
+monthly_rate_all$name <- gsub('X','',monthly_rate_all$name)
+monthly_rate_all$month <- as.integer(monthly_rate_all$name)
+monthly_rate_all <- select(monthly_rate_all, -name)
+
+
+monthly_rate_all$district <- factor(monthly_rate_all$district,
+                                   levels = c(1,2,3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14),
+                                   labels = c("Dakar", "Ziguinchor", "Diourbel", "Saint-Louis",
+                                              "Tambacounda", "Kaolack", "Thies", "Louga",
+                                              "Fatick", "Kolda", "Matam", "Kaffrine", 
+                                              "Kedougou", "Sedhiou"))
+
+
+monthly_rate_all <- monthly_rate_all |> filter(month > 27 & month < 94)
+
+xaxis <- seq(as.Date("2010/6/1"), by = "month", length.out = 66) 
+monthly_rate_all$my <- vec_rep(rev(xaxis), 14)
+```
+
 
 #Results
 (1 - 2.5 pages of text, 50 pts):
-The text in the results should guide the reader through your analysis and describe what each plot or table is showing, and how it relates to the central question you are trying to ask. Feel free to reiterate key concepts of the methodology and how they help analyze the question or topic.
+The text in the results should guide the reader through your analysis and describe what each plot or table is showing, and how it relates to the central question you are trying to ask.
+```{r}
+#Showing tables with monthly variable for contraceptive use and postpartum status
+head(full_data_mc)
+head(full_data_pp)
 
-Explanation of why your extensive web scraping or wrangling was necessary (5 pts)
+#Showing table with monthly rates
+head(monthly_rate_all, 14)
+```
+
+Feel free to reiterate key concepts of the methodology and how they help analyze the question or topic.
+
+Explanation of why your extensive wrangling was necessary (5 pts)
 Two tables showing relevant parts of the dataset 1) before and 2) after (10 pts)
 3+ key plots or tables illustrating your major analysis (35 pts)
+
+```{r}
+phase_1 <- c("Dakar")
+phase_2 <- c("Thies", "Kaolack")
+phase_3 <- c("Diourbel", "Kaffrine", "Fatick", "Matam")
+phase_4 <- c("Saint-Louis", "Louga")
+comparison <- c("Tambacounda", "Kedougou", "Kolda", "Sedhiou", "Ziguinchor")
+
+
+monthly_rate_all <- monthly_rate_all |> 
+  mutate(phase=case_when(district %in% phase_1~"intervention district",
+                         district %in% phase_2~"intervention district",
+                         district %in% phase_3~"intervention district",
+                         district %in% phase_4~"intervention district",
+                         TRUE~"comparison district"))
+
+g1 <- monthly_rate_all |> filter(district == "Dakar") |>
+  ggplot(aes(my, value))+
+  geom_line(aes(group=district))+
+  geom_smooth(aes(group = district),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[586]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Dakar - June 2012")+
+  theme(legend.position = "none")
+
+g2 <- monthly_rate_all |> filter(district == "Thies") |>
+  ggplot(aes(my, value))+
+  geom_line(aes(group=district))+
+  geom_smooth(aes(group = district),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[436]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Thies - April 2013")+
+  theme(legend.position = "none")
+
+g3 <- monthly_rate_all |> filter(district == "Kaolack") |>
+  ggplot(aes(my, value))+
+  geom_line(aes(group=district))+
+  geom_smooth(aes(group = district),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[436]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Kaolack - April 2013")+
+  theme(legend.position = "none")
+
+g4 <- monthly_rate_all |> filter(district == "Diourbel") |>
+  ggplot(aes(my, value))+
+  geom_line(aes(group=district))+
+  geom_smooth(aes(group = district),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[290]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Diourbel - March 2014")+
+  theme(legend.position = "none")
+
+g5 <- monthly_rate_all |> filter(district == "Kaffrine") |>
+  ggplot(aes(my, value))+
+  geom_line(aes(group=district))+
+  geom_smooth(aes(group = district),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[290]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Kaffrine - March 2014")+
+  theme(legend.position = "none")
+
+g6 <- monthly_rate_all |> filter(district == "Fatick") |>
+  ggplot(aes(my, value))+
+  geom_line(aes(group=district))+
+  geom_smooth(aes(group = district),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[290]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Fatick - March 2014")+
+  theme(legend.position = "none")
+
+g7 <- monthly_rate_all |> filter(district == "Matam") |>
+  ggplot(aes(my, value))+
+  geom_line(aes(group=district))+
+  geom_smooth(aes(group = district),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[290]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Matam - March 2014")+
+  theme(legend.position = "none")
+
+g8 <- monthly_rate_all |> filter(district == "Saint-Louis") |>
+  ggplot(aes(my, value))+
+  geom_line(aes(group=district))+
+  geom_smooth(aes(group = district),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[267]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Saint-Louis - April 2014")+
+  theme(legend.position = "none")
+
+g9 <- monthly_rate_all |> filter(district == "Louga") |>
+  ggplot(aes(my, value))+
+  geom_line(aes(group=district))+
+  geom_smooth(aes(group = district),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[225]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Louga - July 2014")+
+  theme(legend.position = "none")
+
+graph1 <- ggarrange(g1, g2, g3, g4, g5, g6, g7, g8, g9)
+graph1 <- annotate_figure(graph1, top = text_grob("Postpartum Modern Contraceptive Use in Intervention Districts"))
+
+#WITH COMPARISON DISTRICTS
+g10 <- monthly_rate_all |> filter(district == "Dakar" | district %in% comparison) |>
+  ggplot(aes(my, value))+
+  geom_smooth(aes(group = district, color=phase),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[586]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Dakar - June 2012")+
+  theme(legend.position = "none")
+
+g11 <- monthly_rate_all |> filter(district == "Thies"| district %in% comparison) |>
+  ggplot(aes(my, value))+
+  geom_smooth(aes(group = district, color=phase),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[436]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Thies - April 2013")+
+  theme(legend.position = "none")
+
+g12 <- monthly_rate_all |> filter(district == "Kaolack" | district %in% comparison) |>
+  ggplot(aes(my, value))+
+  geom_smooth(aes(group = district, color=phase),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[436]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Kaolack - April 2013")+
+  theme(legend.position = "none")
+
+g13 <- monthly_rate_all |> filter(district == "Diourbel" | district %in% comparison) |>
+  ggplot(aes(my, value))+
+  geom_smooth(aes(group = district, color=phase),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[290]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Diourbel - March 2014")+
+  theme(legend.position = "none")
+
+g14 <- monthly_rate_all |> filter(district == "Kaffrine" | district %in% comparison) |>
+  ggplot(aes(my, value))+
+  geom_smooth(aes(group = district, color=phase),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[290]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Kaffrine - March 2014")+
+  theme(legend.position = "none")
+
+g15 <- monthly_rate_all |> filter(district == "Fatick" | district %in% comparison) |>
+  ggplot(aes(my, value))+
+  geom_smooth(aes(group = district, color=phase),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[290]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Fatick - March 2014")+
+  theme(legend.position = "none")
+
+g16 <- monthly_rate_all |> filter(district == "Matam" | district %in% comparison) |>
+  ggplot(aes(my, value))+
+  geom_smooth(aes(group = district, color=phase),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[290]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Matam - March 2014")+
+  theme(legend.position = "none")
+
+g17 <- monthly_rate_all |> filter(district == "Saint-Louis" | district %in% comparison) |>
+  ggplot(aes(my, value))+
+  geom_smooth(aes(group = district, color=phase),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[267]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Saint-Louis - April 2014")+
+  theme(legend.position = "none")
+
+g18 <- monthly_rate_all |> filter(district == "Louga" | district %in% comparison) |>
+  ggplot(aes(my, value))+
+  geom_smooth(aes(group = district, color=phase),  
+              method = "loess", formula=y~x, se = FALSE) +
+  geom_vline(xintercept = as.numeric(monthly_rate_all$my[225]))+
+  theme_bw()+
+  ylab("% using modern contraception")+
+  xlab("Time")+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y")+
+  theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
+  ggtitle("Louga - July 2014")+
+  theme(legend.position = "none")
+
+graph2 <- ggarrange(g10, g11, g12, g13, g14, g15, g16, g17, g18)
+graph2 <- annotate_figure(graph2, top = text_grob("Postpartum Modern Contraceptive Use in Intervention Districts (blue)"))
+
+graph1
+graph2
+```
+
 
 #Conclusion
 (.5 pages of text, 15 pts):
