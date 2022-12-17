@@ -1,9 +1,9 @@
 name: "my-website"
 output_dir: "."
 navbar:
-  title: "My Website"
+  title: "Dea Oviedo Final Project"
   left:
-    - text: "Home"
+    - text: "Final Project"
       href: index.html
-    - text: "Tab 1"
+    - text: "Methods"
   
