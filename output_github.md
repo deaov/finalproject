@@ -3,111 +3,7 @@ Final Project
 Dea Oviedo
 2022-12-13
 
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
-
-    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-
-    ## ✔ ggplot2 3.4.0     ✔ readr   2.1.2
-    ## ✔ tibble  3.1.8     ✔ purrr   0.3.4
-    ## ✔ tidyr   1.2.0     ✔ forcats 0.5.1
-
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## ✖ dplyr::filter() masks stats::filter()
-    ## ✖ dplyr::lag()    masks stats::lag()
-
-    ## Loading required package: maditr
-
-    ## 
-    ## To select columns from data: columns(mtcars, mpg, vs:carb)
-
-    ## 
-    ## Attaching package: 'maditr'
-
-    ## The following object is masked from 'package:purrr':
-    ## 
-    ##     transpose
-
-    ## The following object is masked from 'package:readr':
-    ## 
-    ##     cols
-
-    ## The following objects are masked from 'package:dplyr':
-    ## 
-    ##     between, coalesce, first, last
-
-    ## 
-    ## Use 'expss_output_rnotebook()' to display tables inside R Notebooks.
-    ##  To return to the console output, use 'expss_output_default()'.
-
-    ## 
-    ## Attaching package: 'expss'
-
-    ## The following objects are masked from 'package:purrr':
-    ## 
-    ##     keep, modify, modify_if, when
-
-    ## The following objects are masked from 'package:tidyr':
-    ## 
-    ##     contains, nest
-
-    ## The following object is masked from 'package:ggplot2':
-    ## 
-    ##     vars
-
-    ## The following objects are masked from 'package:dplyr':
-    ## 
-    ##     compute, contains, na_if, recode, vars
-
-    ## The following objects are masked from 'package:stringr':
-    ## 
-    ##     fixed, regex
-
-    ## The following objects are masked from 'package:haven':
-    ## 
-    ##     is.labelled, read_spss
-
-    ## 
-    ## Attaching package: 'vctrs'
-
-    ## The following object is masked from 'package:tibble':
-    ## 
-    ##     data_frame
-
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     data_frame
-
-    ## 
-    ## Attaching package: 'labelled'
-
-    ## The following object is masked from 'package:expss':
-    ## 
-    ##     is.labelled
-
-    ## 
-    ## Attaching package: 'ggpubr'
-
-    ## The following object is masked from 'package:expss':
-    ## 
-    ##     compare_means
-
-    ## 
-    ## Attaching package: 'lubridate'
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     date, intersect, setdiff, union
-
-\#Introduction
+# Introduction
 
 In 2012, the Senegalese government implemented the Informed Push Model
 (IPM), a supply chain model where third-party logisticians were
@@ -210,27 +106,39 @@ table(str_length(d_14$vcal_1)) #confirming variable length of 80 characters
     ##   80 
     ## 4584
 
-\#Methodology The outcome variable in this analysis is the monthly rate
-of postpartum modern contraceptive use. I use an adapted version of the
-UNFPA definition of modern contraceptive methods: hormonal implants,
-IUDs, female and male sterilization, hormonal pills and injectables,
-male and female condoms, and other supply methods.5 The denominator of
-my outcome variable is the total number of women who were within one
-year of their last delivery. Among those women, the numerator is the
-number that are using a modern method of contraception.
+# Methodology
 
-The codes for events captured in the string are: “B” - Birth “P” -
-Pregnancy “T” - Terminated pregnancy/non-live birth “0” - No
+The outcome variable in this analysis is the monthly rate of postpartum
+modern contraceptive use. I use an adapted version of the UNFPA
+definition of modern contraceptive methods: hormonal implants, IUDs,
+female and male sterilization, hormonal pills and injectables, male and
+female condoms, and other supply methods.5 The denominator of my outcome
+variable is the total number of women who were within one year of their
+last delivery. Among those women, the numerator is the number that are
+using a modern method of contraception.
+
+The codes for events captured in the string are: \* “B” - Birth \* “P” -
+Pregnancy \* “T” - Terminated pregnancy/non-live birth \* “0” - No
 contraception
 
-Traditional methods of contraception “8” - Periodic abstinence “9” -
-Withdrawal “W” - Other traditional methods “L” - Lactational amenorrhea
-method
-
-Modern methods of contraception “1” - Pill “2” - IUD “3” - Injectables
-“4” - Diaphragm “5” - Condom “6” - Female sterilization “7” - Male
-sterilization “N” - Implants “C” - Female condom “F” - Foam and jelly
-“E” - Emergency contraception “M” - Other modern method
+- Traditional methods of contraception
+  - “8” - Periodic abstinence
+  - “9” - Withdrawal
+  - “W” - Other traditional methods
+  - “L” - Lactational amenorrhea method
+- Modern methods of contraception
+  - “1” - Pill
+  - “2” - IUD
+  - “3” - Injectables
+  - “4” - Diaphragm
+  - “5” - Condom
+  - “6” - Female sterilization
+  - “7” - Male sterilization
+  - “N” - Implants
+  - “C” - Female condom
+  - “F” - Foam and jelly
+  - “E” - Emergency contraception
+  - “M” - Other modern method
 
 The methodology for this analysis will consist of string variable
 manipulation to check whether a respondent was within the first year
@@ -255,30 +163,7 @@ to visualize differences in patterns/trends before and after the
 intervention took place. I will also plot each intervention district
 with the comparison districts.
 
-    ##   [1] "1"           "2"           "3"           "4"           "5"          
-    ##   [6] "6"           "7"           "8"           "9"           "10"         
-    ##  [11] "11"          "12"          "13"          "14"          "15"         
-    ##  [16] "16"          "17"          "18"          "19"          "20"         
-    ##  [21] "21"          "22"          "23"          "24"          "25"         
-    ##  [26] "26"          "27"          "28"          "29"          "30"         
-    ##  [31] "31"          "32"          "33"          "34"          "35"         
-    ##  [36] "36"          "37"          "38"          "39"          "40"         
-    ##  [41] "41"          "42"          "43"          "44"          "45"         
-    ##  [46] "46"          "47"          "48"          "49"          "50"         
-    ##  [51] "51"          "52"          "53"          "54"          "55"         
-    ##  [56] "56"          "57"          "58"          "59"          "60"         
-    ##  [61] "61"          "62"          "63"          "64"          "65"         
-    ##  [66] "66"          "67"          "68"          "69"          "70"         
-    ##  [71] "71"          "72"          "73"          "74"          "75"         
-    ##  [76] "76"          "77"          "78"          "79"          "80"         
-    ##  [81] "81"          "82"          "83"          "84"          "85"         
-    ##  [86] "86"          "87"          "88"          "89"          "90"         
-    ##  [91] "91"          "92"          "93"          "94"          "95"         
-    ##  [96] "96"          "97"          "98"          "99"          "100"        
-    ## [101] "101"         "102"         "103"         "104"         "caseid"     
-    ## [106] "survey_year" "region"      "wt"
-
-\#Results
+# Results
 
 Data wrangling
 
@@ -459,10 +344,12 @@ things happening in Senegal that affected non-intervention districts
 too.
 ![](output_github_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->![](output_github_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->![](output_github_files/figure-gfm/unnamed-chunk-13-3.png)<!-- -->
 
-\#Conclusion In this project, I used data wrangling and visualization,
-as well as smoothing to generate a descriptive, visual analysis of
-trends of postpartum contraceptive use among women in Senegal at the
-district level.
+# Conclusion
+
+In this project, I used data wrangling and visualization, as well as
+smoothing to generate a descriptive, visual analysis of trends of
+postpartum contraceptive use among women in Senegal at the district
+level.
 
 In the future, I will use this project to conduct a
 difference-in-differences analysis to evaluate the impact of the IPM on
@@ -476,9 +363,11 @@ analysis could be the use of synthetic controls to see whether the
 national scale-up of IPM (including all 14 of Senegal’s districts) had
 an impact on national postpartum contraceptive use.
 
-\#References \[1\] Ministère de la Santé et de l’Action Sociale. Plan
-d’action national de planification familiale 2012-2015. Sénégal:
-Direction de la Santé, Division de la Santé de la Reproduction; 2012.
+# References
+
+\[1\] Ministère de la Santé et de l’Action Sociale. Plan d’action
+national de planification familiale 2012-2015. Sénégal: Direction de la
+Santé, Division de la Santé de la Reproduction; 2012.
 
 \[2\] Cavallaro, F.L., Duclos, D., Baggaley, R.F. et al. Taking stock:
 protocol for evaluating a family planning supply chain intervention in
@@ -503,7 +392,7 @@ Guttmacher Institute and United Nations Population Fund; 2014
 <https://www.unfpa.org/sites/default/files/pub-pdf/Adding%20It%20Up-Final->
 11.18.14.pdf, Last accessed 5 November 2022\].
 
-\#Appendix
+# Appendix
 
 Code used:
 
@@ -511,16 +400,17 @@ library(haven) library(stringr) library(dplyr) library(tidyverse)
 library(tibble) library(expss) library(vctrs) library(labelled)
 library(ggpubr) library(lubridate)
 
-\##Importing the data senegal_14 \<-
-read_dta(“/Users/deaoviedo/Documents/grad/classes/2 THESIS/data/Senegal
-2014/SNIR70DT/SNIR70DT/SNIR70FL.DTA”) senegal_15 \<-
+## Importing the data
+
+senegal_14 \<- read_dta(“/Users/deaoviedo/Documents/grad/classes/2
+THESIS/data/Senegal 2014/SNIR70DT/SNIR70DT/SNIR70FL.DTA”) senegal_15 \<-
 read_dta(“/Users/deaoviedo/Documents/grad/classes/2 THESIS/data/Senegal
 2015/SNIR7HDT/SNIR7HFL.DTA”) senegal_16 \<-
 read_dta(“/Users/deaoviedo/Documents/grad/classes/2 THESIS/data/Senegal
 2016/SNIR7IDT/SNIR7IDT/SNIR7IFL.DTA”)
 
-\##Generating variable for women who have given birth in the dataset (at
-any time)
+## Generating variable for women who have given birth in the dataset (at any time)
+
 senegal_14![gave_birth \<- as.integer(str_detect(senegal_14](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;gave_birth%20%3C-%20as.integer%28str_detect%28senegal_14 "gave_birth <- as.integer(str_detect(senegal_14")vcal_1,
 “B”))
 senegal_15![gave_birth \<- as.integer(str_detect(senegal_15](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;gave_birth%20%3C-%20as.integer%28str_detect%28senegal_15 "gave_birth <- as.integer(str_detect(senegal_15")vcal_1,
@@ -528,29 +418,36 @@ senegal_15![gave_birth \<- as.integer(str_detect(senegal_15](https://latex.codec
 senegal_16![gave_birth \<- as.integer(str_detect(senegal_16](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;gave_birth%20%3C-%20as.integer%28str_detect%28senegal_16 "gave_birth <- as.integer(str_detect(senegal_16")vcal_1,
 “B”))
 
-\##Generating weight variable
+## Generating weight variable
+
 senegal_14![wt \<- senegal_14](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;wt%20%3C-%20senegal_14 "wt <- senegal_14")v005/1000000
 senegal_15![wt \<- senegal_15](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;wt%20%3C-%20senegal_15 "wt <- senegal_15")v005/1000000
 senegal_16![wt \<- senegal_16](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;wt%20%3C-%20senegal_16 "wt <- senegal_16")v005/1000000
 
-\##Creating separate data frames with sample of only women who have
-given birth in 5 yrs preceding survey d_14 \<- senegal_14 \|\>
-filter(gave_birth == 1) d_15 \<- senegal_15 \|\> filter(gave_birth == 1)
-d_16 \<- senegal_16 \|\> filter(gave_birth == 1)
+## Creating separate data frames with sample of only women who have given birth in 5 yrs preceding survey
 
-\##Viewing main variables for this analysis d_14 \|\>
-rename(individual_weight=wt, calendar_variable = vcal_1, district =
-v024) \|\> select(individual_weight, district, calendar_variable)
+d_14 \<- senegal_14 \|\> filter(gave_birth == 1) d_15 \<- senegal_15
+\|\> filter(gave_birth == 1) d_16 \<- senegal_16 \|\> filter(gave_birth
+== 1)
 
-\##Names of districts in Senegal val_lab(d_14\$v024)
+## Viewing main variables for this analysis
 
-\##A closer look at the calendar variable
+d_14 \|\> rename(individual_weight=wt, calendar_variable = vcal_1,
+district = v024) \|\> select(individual_weight, district,
+calendar_variable)
+
+## Names of districts in Senegal
+
+val_lab(d_14\$v024)
+
+## A closer look at the calendar variable
+
 head(d_14![vcal_1) table(str_length(d_14](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;vcal_1%29%20table%28str_length%28d_14 "vcal_1) table(str_length(d_14")vcal_1))
 \#confirming variable length of 80 characters
 
-\##Check whether at each row of the calendar variable the respondent was
-using a modern method of contraception data_mc_14 \<-
-data.frame(matrix(NA, nrow = nrow(d_14), ncol = 80))
+## Check whether at each row of the calendar variable the respondent was using a modern method of contraception
+
+data_mc_14 \<- data.frame(matrix(NA, nrow = nrow(d_14), ncol = 80))
 
 data_mc_15 \<- data.frame(matrix(NA, nrow = nrow(d_15), ncol = 80))
 
@@ -578,9 +475,9 @@ data_mc_16 \<- data.frame(matrix(NA, nrow = nrow(d_16), ncol = 80))
       data_mc_16[ , i] <- uses
     }
 
-\##Check whether respondents were within 12 months postpartum at
-particular month data_pp_14 \<- data.frame(matrix(NA, nrow = nrow(d_14),
-ncol = 80))
+## Check whether respondents were within 12 months postpartum at particular month
+
+data_pp_14 \<- data.frame(matrix(NA, nrow = nrow(d_14), ncol = 80))
 
 data_pp_15 \<- data.frame(matrix(NA, nrow = nrow(d_15), ncol = 80))
 
@@ -622,28 +519,32 @@ data_pp_16 \<- data.frame(matrix(NA, nrow = nrow(d_16), ncol = 80))
       data_pp_16[ , i] <- real_pp
     }
 
-\##Adding region variable to dataframe
+## Adding region variable to dataframe
+
 data_mc_14![region \<- d_14](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;region%20%3C-%20d_14 "region <- d_14")v024
 data_mc_15![region \<- d_15](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;region%20%3C-%20d_15 "region <- d_15")v024
 data_mc_16![region \<- d_16](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;region%20%3C-%20d_16 "region <- d_16")v024
 
-\##Adding weight variable to dataframe
+## Adding weight variable to dataframe
+
 data_mc_14![wt \<- d_14](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;wt%20%3C-%20d_14 "wt <- d_14")wt
 data_mc_15![wt \<- d_15](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;wt%20%3C-%20d_15 "wt <- d_15")wt
 data_mc_16![wt \<- d_16](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;wt%20%3C-%20d_16 "wt <- d_16")wt
 
-\##Adding ID
+## Adding ID
+
 data_mc_14![caseid \<- d_14](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;caseid%20%3C-%20d_14 "caseid <- d_14")caseid
 data_mc_15![caseid \<- d_15](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;caseid%20%3C-%20d_15 "caseid <- d_15")caseid
 data_mc_16![caseid \<- d_16](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;caseid%20%3C-%20d_16 "caseid <- d_16")caseid
 
-\##Adding survey year
+## Adding survey year
+
 data_mc_14![survey_year \<- d_14](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;survey_year%20%3C-%20d_14 "survey_year <- d_14")v007
 data_mc_15![survey_year \<- d_15](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;survey_year%20%3C-%20d_15 "survey_year <- d_15")v007
 data_mc_16![survey_year \<- d_16](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;survey_year%20%3C-%20d_16 "survey_year <- d_16")v007
 
-\##Renaming column names to represent the number of months prior to
-August 2017 (the month and year the 2016 survey data were published)
+## Renaming column names to represent the number of months prior to August 2017 (the month and year the 2016 survey data were published)
+
 names(data_mc_14)\[1:80\] \<- 25:104 names(data_pp_14)\[1:80\] \<-
 25:104 names(data_mc_15)\[1:80\] \<- 13:92 names(data_pp_15)\[1:80\] \<-
 13:92 names(data_mc_16)\[1:80\] \<- 1:80 names(data_pp_16)\[1:80\] \<-
@@ -655,8 +556,9 @@ full_data_mc \<- full_data_mc \|\> relocate(“caseid”, “survey_year”,
 
 full_data_pp \<- bind_rows(data_pp_16, data_pp_15, data_pp_14)
 
-\##Creating monthly outcome var monthly_rate_all \<-
-data.frame(matrix(NA, nrow = 14, ncol = 104))
+## Creating monthly outcome var
+
+monthly_rate_all \<- data.frame(matrix(NA, nrow = 14, ncol = 104))
 
 for(i in 1:104){
 full_data_mc![numerator \<- ifelse(full_data_mc\[,i\] == 1 & full_data_pp\[,i\] == 1, 1, 0)  full_data_mc](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;numerator%20%3C-%20ifelse%28full_data_mc%5B%2Ci%5D%20%3D%3D%201%20%26%20full_data_pp%5B%2Ci%5D%20%3D%3D%201%2C%201%2C%200%29%20%20full_data_mc "numerator <- ifelse(full_data_mc[,i] == 1 & full_data_pp[,i] == 1, 1, 0)  full_data_mc")denominator
@@ -664,7 +566,8 @@ full_data_mc![numerator \<- ifelse(full_data_mc\[,i\] == 1 & full_data_pp\[,i\] 
 == 1) \|\> group_by(region) \|\> summarize(weighted.mean(numerator, wt))
 monthly_rate_all\[,i\] \<- rate\[,2\] }
 
-\##restructure data
+## restructure data
+
 monthly_rate_all![district \<- 1:14 monthly_rate_all \<- pivot_longer(monthly_rate_all, cols=-district) monthly_rate_all](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;district%20%3C-%201%3A14%20monthly_rate_all%20%3C-%20pivot_longer%28monthly_rate_all%2C%20cols%3D-district%29%20monthly_rate_all "district <- 1:14 monthly_rate_all <- pivot_longer(monthly_rate_all, cols=-district) monthly_rate_all")name
 \<-
 gsub(‘X’,’’,monthly_rate_all![name) monthly_rate_all](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;name%29%20monthly_rate_all "name) monthly_rate_all")month
@@ -694,8 +597,10 @@ district %in% phase_2\~“intervention district”, district %in%
 phase_3\~“intervention district”, district %in% phase_4\~“intervention
 district”, TRUE\~“comparison district”))
 
-\##Graphing g1 \<- monthly_rate_all \|\> filter(district == “Dakar”)
-\|\> ggplot(aes(my, value))+ geom_line(aes(group=district))+
+## Graphing
+
+g1 \<- monthly_rate_all \|\> filter(district == “Dakar”) \|\>
+ggplot(aes(my, value))+ geom_line(aes(group=district))+
 geom_smooth(aes(group = district),  
 method = “loess”, formula=y\~x, se = FALSE) + geom_vline(xintercept =
 as.numeric(monthly_rate_all\$my\[37\]))+ theme_bw()+ ylab(“% using
@@ -798,10 +703,11 @@ Districts”))
 
 graph1 graph2 graph3
 
-\##Graphing with comparison districts g10 \<- monthly_rate_all \|\>
-filter(district == “Dakar” \| district %in% comparison) \|\>
-ggplot(aes(my, value))+ geom_smooth(aes(group = district,
-color=phase),  
+## Graphing with comparison districts
+
+g10 \<- monthly_rate_all \|\> filter(district == “Dakar” \| district
+%in% comparison) \|\> ggplot(aes(my, value))+ geom_smooth(aes(group =
+district, color=phase),  
 method = “loess”, formula=y\~x, se = FALSE) + geom_vline(xintercept =
 as.numeric(monthly_rate_all\$my\[37\]))+ theme_bw()+ ylab(“% using
 modern contraception”)+ xlab(“Time”)+ scale_x\_date(date_breaks = “1
