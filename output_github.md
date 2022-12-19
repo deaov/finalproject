@@ -108,18 +108,18 @@ month (numerator). This will yield six different data frames, two for
 each survey year. One data frame will have, for each respondent, whether
 or not they were using a modern method of contraception at each month
 over the 80 months prior to the survey. Similarly, the other data frame
-will record, for each respondent, whether or not they were within the
-first year postpartum within a each month. I do this process for each
-survey year separately and will then join the six dataframes into two
-dataframes, one for postpartum observations for all survey years and the
-other for contraceptive use observations for all survey years. Once I’ve
-completed this step, I will calculate the postpartum contraceptive use
-rate for each month using the weights provided for the sampling units. I
-will graph these monthly rates for each district with visualizations for
-the month of the intervention in that district and will use smoothing to
-try to visualize differences in patterns/trends before and after the
-intervention took place. I will also plot each intervention district
-with the comparison districts.
+will record, for each respondent, whether or not at a given month they
+were within the first year postpartum. I complete this process for each
+survey year separately and will then join the six data frames into two
+data frames, one for postpartum observations for all survey years and
+the other for contraceptive use observations for all survey years. Once
+I’ve completed this step, I will calculate the postpartum contraceptive
+use rate for each month using the weights provided for the sampling
+units. I will graph these monthly rates for each district with
+visualizations for the month of the intervention in that district and
+will use smoothing to try to visualize differences in patterns/trends
+before and after the intervention took place. I will also plot each
+intervention district with the comparison districts.
 
 # Results
 
@@ -189,11 +189,11 @@ and denominator, on January 2014 she is only counted in the denominator
 We repeat this for every month for each respondent in all three years’
 datasets.
 
-I combined the three years’ data-frames into two data-frames (one for
+I combined the three years’ data frames into two data frames (one for
 whether a respondent was in the first year postpartum and one for
 whether she was using a modern method of contraception). A part of one
 of the tables is displayed below, showing monthly contraceptive use for
-respondents 1 through 6 in the combined dataframe for the 17-25 months
+respondents 1 through 6 in the combined data frame for the 17-25 months
 prior to August 2017 (August 2015-April 2016).
 
     ##   17 18 19 20 21 22 23 24 25
@@ -206,7 +206,7 @@ prior to August 2017 (August 2015-April 2016).
 
 I calculated the monthly contraceptive use rate for January 2010 through
 June 2015 by district and used pivot_longer to restructure the data into
-a time-series data-frame with one observation (“value”, the rate) for
+a time-series data frame with one observation (“value”, the rate) for
 each district for each month. I used the lubridate package to generate
 the dates to make it easier to understand the plots of my results.
 
@@ -276,7 +276,9 @@ Evaluation of Senegal supply chain intervention on contraceptive
 stockouts using routine stock data. PLoS One. 2020 Aug 3;15(8):e0236659.
 doi: 10.1371/journal.pone.0236659. PMID: 32745110; PMCID: PMC7398546.
 
-\[3\] CITE SENEGAL DHS DATA
+\[3\] ICF International. Demographic and Health Surveys (various)
+\[Datasets\]. <https://dhsprogram.com/data/available-datasets.cfm>. Date
+accessed: December 2022
 
 \[4\] Singh S, Darroch J, Ashford L. Adding it up: the costs and
 benefits of investing in sexual and reproductive health. New York:
@@ -461,12 +463,12 @@ data_pp_16 <- data.frame(matrix(NA,
       data_pp_16[ , i] <- real_pp
     }
 
-## Adding region variable to dataframe
+## Adding region variable to data frame
 data_mc_14$region <- d_14$v024
 data_mc_15$region <- d_15$v024
 data_mc_16$region <- d_16$v024
 
-## Adding weight variable to dataframe
+## Adding weight variable to data frame
 data_mc_14$wt <- d_14$wt
 data_mc_15$wt <- d_15$wt
 data_mc_16$wt <- d_16$wt
