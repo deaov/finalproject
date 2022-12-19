@@ -1,11 +1,13 @@
 ---
 title: "BST 260 Final Project - District-Level Trends in Postpartum Contraceptive Use in Senegal Following a Contraceptive Supply Chain Intervention"
-output: html_document
+author: "Dea Oviedo"
+output:
+  pdf_document: default
+  github_document: default
 ---
 ```{r setup, include=FALSE, echo=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
 ```{r, echo=FALSE, include=FALSE}
 library(haven)
 library(stringr)

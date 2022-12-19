@@ -1,7 +1,7 @@
 name: "my-website"
 output_dir: "."
 navbar:
-  title: "Dea Oviedo Final Project"
+  title: "BST 260 Final Project - District-Level Trends in Postpartum Contraceptive Use in Senegal Following a Contraceptive Supply Chain Intervention"
   left:
     - text: "Final Project"
       href: index.html

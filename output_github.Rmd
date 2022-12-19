@@ -1,5 +1,5 @@
 ---
-title: "Final Project"
+title: "BST 260 Final Project - District-Level Trends in Postpartum Contraceptive Use in Senegal Following a Contraceptive Supply Chain Intervention"
 author: "Dea Oviedo"
 date: "2022-12-13"
 output: github_document
@@ -27,15 +27,6 @@ senegal_16 <- read_dta("/Users/deaoviedo/Documents/grad/classes/2 THESIS/data/Se
 ```
 
 # Introduction
-
-In 2012, the Senegalese government implemented the Informed Push Model (IPM), a supply chain model where third-party logisticians were contracted to deliver family planning supplies to service delivery points directly from regional storerooms. After the intervention pilot in Dakar in 2012 nearly eliminated stock-outs for contraceptives, the Senegalese government decided to expand the IPM across different districts over a 3-year period before scaling up the intervention at a national level.2 
-
-While studies have found that the IPM roll-out resulted in an increase in the availability of contraceptive methods and a decrease in the duration of stock-outs, there is limited evidence on the impact of the IPM on contraceptive use.3 To help fill this gap, this work will look at trends in modern contraceptive use among postpartum women (an important beneficiary group of family planning policies and programs given the benefits of increased birth intervals on the health of mothers and their babies) before and after the IPM was implemented. Districts where the IPM was implemented prior to January 2015 will serve as the intervention districts. These districts are Dakar (Dec 2012); Kaolack and Thies (Apr 2013); Diourbel, Fatick, Kaffrine and Matam (Mar 2014); Saint-Louis (Apr 2014); and Louga (Jul 2014). Districts where the IPM was implemented after January 2015 will serve as comparison districts (Tambacounda, Kolda, Kedougou, Sedhiou and Ziguinchor).
-
-The Demographic and Health Survey (DHS) is a nationally representative survey that collects information on sociodemographic characteristics, reproduction, knowledge and use of contraception, fertility preferences, among others. The DHS collects information on women’s reproductive history through its contraceptive calendar, a string variable containing 80 characters (with each character representing a month) that provides a retrospective account recording births, pregnancies, terminations, and contraceptive use over the 80 months preceding the survey's publication (usually August of the year following data collection). This information can be used to determine whether, at any given month before the survey, a respondent was within the first postpartum year, and whether she was using a modern method of contraception. 
-
-Data from Senegal’s 2014, 2015 and 2016 Continuous DHS were obtained. The original data sets contain 3989 (2014), 3998 (2015) and 4070 (2016) variables; and n=8488 (2014), n=8851 (2015) and n=8865 (2016) observations for women ages 15-49. For this analysis, I will limit the study sample to include only respondents who have given birth in the 5 years preceding each survey (n=4584 in 2014, n=4799 in 2015 and n=4726 in 2016). The main variables that will be utilized for this analysis are individual sample weights, respondent's district of residence, and the calendar variable.
-
 ```{r, echo=FALSE}
 #Generating variable for women who have given birth in the dataset (at any time)
 senegal_14$gave_birth <- as.integer(str_detect(senegal_14$vcal_1, "B"))
@@ -53,25 +44,19 @@ d_14 <- senegal_14 |> filter(gave_birth == 1)
 d_15 <- senegal_15 |> filter(gave_birth == 1)
 d_16 <- senegal_16 |> filter(gave_birth == 1)
 ```
+In 2012, the Senegalese government implemented the Informed Push Model (IPM), a supply chain model where third-party logisticians were contracted to deliver family planning supplies to service delivery points directly from regional storerooms. After the intervention pilot in Dakar in 2012 nearly eliminated stock-outs for contraceptives, the Senegalese government decided to expand the IPM across different districts over a 3-year period before scaling up the intervention at a national level.[1] There is limited evidence on the impact of the IPM on contraceptive use.[2] To help fill this gap, this work will look at trends in modern contraceptive use among postpartum women (an important beneficiary group of family planning policies and programs given the benefits of increased birth intervals on the health of mothers and their babies) before and after the IPM was implemented. Districts where the IPM was implemented prior to January 2015 will serve as the intervention districts. These districts are Dakar (Dec 2012); Kaolack and Thies (Apr 2013); Diourbel, Fatick, Kaffrine and Matam (Mar 2014); Saint-Louis (Apr 2014); and Louga (Jul 2014). Districts where the IPM was implemented after January 2015 will serve as comparison districts (Tambacounda, Kolda, Kedougou, Sedhiou and Ziguinchor).
 
-```{r}
+The Demographic and Health Survey (DHS) is a nationally representative survey that collects information on socio-demographic characteristics, reproduction, knowledge and use of contraception, fertility preferences, among others. The DHS collects information on women’s reproductive history through its contraceptive calendar, a string variable containing 80 characters (with each character representing a month) that provides a retrospective account recording births, pregnancies, terminations, and contraceptive use over the 80 months preceding the survey's publication (usually August of the year following data collection). This information can be used to determine whether, at any given month before the survey, a respondent was within the first postpartum year, and whether she was using a modern method of contraception. Data from Senegal’s 2014, 2015 and 2016 Continuous DHS were obtained [3]. The original data sets contain 3989 (2014), 3998 (2015) and 4070 (2016) variables; and n=8488 (2014), n=8851 (2015) and n=8865 (2016) observations for women ages 15-49. For this analysis, I will limit the study sample to include only respondents who have given birth in the 5 years preceding each survey (n=4584 in 2014, n=4799 in 2015 and n=4726 in 2016). The main variables that will be utilized for this analysis are individual sample weights, respondent's district of residence, and the calendar variable:
+```{r, echo=FALSE}
 #Viewing main variables for this analysis
 d_14 |>
   rename(individual_weight=wt, calendar_variable = vcal_1, district = v024) |>
-  select(individual_weight, district, calendar_variable)
-
-#Names of districts in Senegal
-val_lab(d_14$v024)
-
-#A closer look at the calendar variable
-head(d_14$vcal_1)
-table(str_length(d_14$vcal_1)) #confirming variable length of 80 characters
+  select(individual_weight, district, calendar_variable) |> head()
 ```
 
 # Methodology
-The outcome variable in this analysis is the monthly rate of postpartum modern contraceptive use. I use an adapted version of the UNFPA definition of modern contraceptive methods: hormonal implants, IUDs, female and male sterilization, hormonal pills and injectables, male and female condoms, and other supply methods.5 The denominator of my outcome variable is the total number of women who were within one year of their last delivery. Among those women, the numerator is the number that are using a modern method of contraception.
+The outcome variable in this analysis is the monthly rate of postpartum modern contraceptive use. I use an adapted version of the UNFPA definition of modern contraceptive methods: hormonal implants, IUDs, female and male sterilization, hormonal pills and injectables, male and female condoms, and other supply methods.[4] The denominator of my outcome variable is the total number of women who were within one year of their last delivery. Among those women, the numerator is the number that are using a modern method of contraception. The codes for events captured in the string are:
 
-The codes for events captured in the string are:
 * "B" - Birth
 * "P" - Pregnancy
 * "T" - Terminated pregnancy/non-live birth
@@ -97,10 +82,7 @@ The codes for events captured in the string are:
   + "E" - Emergency contraception
   + "M" - Other modern method
 
-The methodology for this analysis will consist of string variable manipulation to check whether a respondent was within the first year postpartum within a given month (denominator) and of those, whether a respondent was using a modern method of contraception within a given month (numerator). 
-
-This will yield six different data frames, two for each survey year. One data frame will have, for each respondent, whether or not they were using a modern method of contraception at each month over the 80 months prior to the survey. Similarly, the other data frame will record, for each respondent, whether or not they were within the first year postpartum within a each month. I do this process for each survey year separately and will then join the six dataframes into two dataframes, one for postpartum observations for all survey years and the other for contraceptive use observations for all survey years. Once I've completed this step, I will calculate the postpartum contraceptive use rate for each month using the weights provided for the sampling units. I will graph these monthly rates for each district with visualizations for the month of the intervention in that district and will use smoothing to try to visualize differences in patterns/trends before and after the intervention took place. I will also plot each intervention district with the comparison districts.
-
+The methodology for this analysis will consist of string variable manipulation to check whether a respondent was within the first year postpartum within a given month (denominator) and of those, whether a respondent was using a modern method of contraception within a given month (numerator). This will yield six different data frames, two for each survey year. One data frame will have, for each respondent, whether or not they were using a modern method of contraception at each month over the 80 months prior to the survey. Similarly, the other data frame will record, for each respondent, whether or not they were within the first year postpartum within a each month. I do this process for each survey year separately and will then join the six dataframes into two dataframes, one for postpartum observations for all survey years and the other for contraceptive use observations for all survey years. Once I've completed this step, I will calculate the postpartum contraceptive use rate for each month using the weights provided for the sampling units. I will graph these monthly rates for each district with visualizations for the month of the intervention in that district and will use smoothing to try to visualize differences in patterns/trends before and after the intervention took place. I will also plot each intervention district with the comparison districts.
 ```{r, echo=FALSE}
 #Check whether at each row of the calendar variable the respondent was using a 
 #modern method of contraception
@@ -260,67 +242,49 @@ xaxis <- seq(as.Date("2010/1/1"), by = "month", length.out = 66)
 monthly_rate_all$my <- vec_rep(rev(xaxis), 14)
 ```
 
-
 # Results
-
-Data wrangling
-
-Extensiva data wrangling was necessary to analyze this dataset. The string variable had to be parsed to be able to extract monthly contraceptive usage and also situated within the postpartum period. For the latter, I had to not just look at the position of the string for the month I was interested in, but also at the 12 preceding months to ascertain whether at any point in those previous 12 months a respondent had given birth.
-
-To illustrate this process, I show the contraceptive calendar of the 77nd respondent from our 2014 DHS sample (prior to any string manipulation):
-```{r}
+Extensiva data wrangling was necessary to analyze this dataset. The string variable had to be parsed to be able to extract monthly contraceptive usage and also to verify whether the respondent was situated within the postpartum period. For the latter, I had to identify the position on the string for the month I was interested in, and also check the 12 preceding months to ascertain whether at any point in those previous 12 months a respondent had given birth. To illustrate this process, I show the contraceptive calendar of the 77nd respondent from our 2014 DHS sample (prior to any string manipulation):
+```{r, echo=FALSE}
 d_14$vcal_1[77] #calendar variable for respondent no. 77
 ```
-Read from left to right, there are 18 spaces from the start of the string to the first non-blank character, representing the 18 months between the date of publication of these data (August 2015) to the month the 77nd respondent was interviewed (February 2014).
-```{r}
-d_14$v006[77] #month of interview
-d_14$v007[77] #year of interview
+Read from left to right, there are 18 spaces from the start of the string to the first non-blank character, representing the 18 months between the date of publication of these data (August 2015) to the month the 77nd respondent was interviewed (February 2014). On February 2014 (19 months before August 2015), this respondent has code "N", which means that she was using implants:
+```{r, echo=FALSE}
+substr(d_14$vcal_1[77], 19, 19) #extract character for 19th month pre-interview
 ```
-
-On February 2014 (19 months before August 2015), this respondent has code "N", which means that she was using implants. The function check_mc I created can verify that this is a modern method of contraception and this respondent would be counted as having used a modern method of contraception on February 2014 
-
-```{r}
-substr(d_14$vcal_1[77], 19, 19)
-check_mc(d_14$vcal_1[77], 19) |> print()
+The function check_mc I created can verify that this is a modern method of contraception and this respondent would be counted as having used a modern method of contraception on February 2014 (where a value = 1 means a modern method was used):
+```{r, echo=FALSE}
+check_mc(d_14$vcal_1[77], 19) |> print() # =1 means modern method was being used
 ```
-We can also see from the vcal_1 shown above that the respondent had given birth shortly before the month she was using an implant. We can use the check_pp function to verify whether she was within one month post-partum.
-```{r}
+We can also see from the vcal_1 shown above that the respondent had given birth shortly before the month she was using an implant. We can use the check_pp function to verify whether on February 2014 she was within one month post-partum.
+```{r, echo=FALSE}
 within_pp(d_14$vcal_1[77], 19) |> print()
 ```
-
-Therefore, since on February 2014 this woman was within her first year postpartum and since she was also using a modern method of contraception, she would be counted in the numerator of our postpartum contraceptive use monthly rate.
-
-On the other hand, if we again take this same woman, on January 2014 (20 months before August 2015) we can see that she was not using a modern method of contraception even though she was also within the first year postpartum:
+Therefore, since on February 2014 this woman was within her first year postpartum and since she was also using a modern method of contraception, she would be counted in the numerator of our postpartum contraceptive use monthly rate. On the other hand, if we again take this same woman, on January 2014 (20 months before August 2015) we can see that she was not using a modern method of contraception, and she was also within the first year postpartum:
 ```{r}
-substr(d_14$vcal_1[77], 20, 20)
-check_mc(d_14$vcal_1[77], 20) |> print()
+substr(d_14$vcal_1[77], 20, 20) #extract character for 20th month pre-interview
+check_mc(d_14$vcal_1[77], 20) |> print() #check whether modern method (0=not modern method)
 
-within_pp(d_14$vcal_1[77], 20) |> print()
+within_pp(d_14$vcal_1[77], 20) |> print() #check within postpartum
 ```
-This means that while on February 2014 she is counted in the numerator and denominator, on January 2014 she is only counted in the numerator. We repeat this for every month for each respondent in all three years' datasets.
-```{r}
-#Showing tables with monthly variable for contraceptive use and postpartum status
-head(full_data_mc[,17:25])
-head(full_data_pp[,17:25])
-```
-I combined the three years' dataframes into two dataframes (one for whether a respondent was in the first year postpartum and one for whether she was using a modern method of contraception). The two tables above show monthly contraceptive use (first table) and postpartum year status (second table) for respondents 1 through 6 respondent in the combined dataframe for the 17-25 months prior to August 2017 (August 2015-April 2016).
+This means that while on February 2014 she is counted in the numerator and denominator, on January 2014 she is only counted in the denominator We repeat this for every month for each respondent in all three years' datasets.
 
-I calculated the monthly rate for January 2010 through June 2015 by district and used pivot_longer to restructure the data into a time-series dataframe with one observation (value, the rate) for each district for each month. I used the lubridate package to generate the dates to make it easier to understand the plots of my results.
-```{r}
+I combined the three years' data-frames into two data-frames (one for whether a respondent was in the first year postpartum and one for whether she was using a modern method of contraception). A part of one of the tables is displayed below, showing monthly contraceptive use for respondents 1 through 6 in the combined dataframe for the 17-25 months prior to August 2017 (August 2015-April 2016).
+```{r, echo=FALSE}
+#table with monthly contraceptive use for respondents in all survey yrs
+head(full_data_mc[,17:25]) 
+```
+I calculated the monthly contraceptive use rate for January 2010 through June 2015 by district and used pivot_longer to restructure the data into a time-series data-frame with one observation ("value", the rate) for each district for each month. I used the lubridate package to generate the dates to make it easier to understand the plots of my results.
+```{r, echo=FALSE}
 #Showing table with monthly rates
 head(monthly_rate_all, 14)
 ```
-
-Once this was done, I could plot graphs of the monthly rate for each district. I visualize my results in two ways:
-
-The first depicts the monthly rate of postpartum contraceptive use for intervention districts only. I added a vertical line at the month and year when the IPM was implemented in each of the intervention districts and used geom_smooth using the loess curve method to get a better sense of the trends before and after the intervention took place.
+Once this was done, I could plot graphs of the monthly rate for each district. I visualize my results in two ways. The first depicts the monthly rate of postpartum contraceptive use for intervention districts only. I added a vertical line at the month and year when the IPM was implemented in each of the intervention districts and used geom_smooth using the loess curve method to get a better sense of the trends before and after the intervention took place. Below I show the original and smoothed trends for Diourbel district:
 ```{r, echo=FALSE}
 phase_1 <- c("Dakar")
 phase_2 <- c("Thies", "Kaolack")
 phase_3 <- c("Diourbel", "Kaffrine", "Fatick", "Matam")
 phase_4 <- c("Saint-Louis", "Louga")
 comparison <- c("Tambacounda", "Kedougou", "Kolda", "Sedhiou", "Ziguinchor")
-
 
 monthly_rate_all <- monthly_rate_all |> 
   mutate(phase=case_when(district %in% phase_1~"intervention district",
@@ -464,15 +428,13 @@ graph2 <- annotate_figure(graph2, top = text_grob("Postpartum Modern Contracepti
 graph3 <- ggarrange(g7, g8, g9)
 graph3 <- annotate_figure(graph3, top = text_grob("Postpartum Modern Contraceptive Use in Intervention Districts"))
 
-graph1
-graph2
-graph3
+#graph1
+#graph2
+#graph3
+g4
 ```
-
-
-I decided to compare trends in intervention districts with districts that did not receive the intervention until after 2015. This will help me get a better sense of whether any changes in levels and/or trends after the IPM in intervention districts was due to IPM or due to other things happening in Senegal that affected non-intervention districts too.
+I decided to compare trends in intervention districts with districts that did not receive the intervention until after 2015. This will help me get a better sense of whether any changes in levels and/or trends after the IPM in intervention districts was due to IPM or due to other things happening in Senegal that affected non-intervention districts too. Below I show trends for Diourbel and comparison districts:
 ```{r, echo=FALSE}
-#WITH COMPARISON DISTRICTS
 g10 <- monthly_rate_all |> filter(district == "Dakar" | district %in% comparison) |>
   ggplot(aes(my, value))+
   geom_smooth(aes(group = district, color=phase),  
@@ -600,11 +562,11 @@ graph5 <- annotate_figure(graph5, top = text_grob("Postpartum Modern Contracepti
 graph6 <- ggarrange(g16, g17, g18)
 graph6 <- annotate_figure(graph6, top = text_grob("Postpartum Modern Contraceptive Use in Intervention Districts (blue)"))
 
-graph4
-graph5
-graph6
+#graph4
+#graph5
+#graph6
+g13
 ```
-
 
 # Conclusion
 In this project, I used data wrangling and visualization, as well as smoothing to generate a descriptive, visual analysis of trends of postpartum contraceptive use among women in Senegal at the district level.
@@ -613,24 +575,21 @@ In the future, I will use this project to conduct a difference-in-differences an
 
 If I had more time, some additional topics I could include in my analysis could be the use of synthetic controls to see whether the national scale-up of IPM (including all 14 of Senegal's districts) had an impact on national postpartum contraceptive use.
 
-
 # References 
-[1] Ministère de la Santé et de l’Action Sociale. Plan d’action national de planification familiale 2012-2015. Sénégal: Direction de la Santé, Division de la Santé de la Reproduction; 2012.
+[1] Cavallaro, F.L., Duclos, D., Baggaley, R.F. et al. Taking stock: protocol for evaluating a family planning supply chain intervention in Senegal. Reprod Health 13, 45 (2016). https://doi.org/10.1186/s12978-016-0163-7
 
-[2] Cavallaro, F.L., Duclos, D., Baggaley, R.F. et al. Taking stock: protocol for evaluating a family planning supply chain intervention in Senegal. Reprod Health 13, 45 (2016). https://doi.org/10.1186/s12978-016-0163-7
+[2] Krug C, Cavallaro FL, Wong KLM, Gasparrini A, Faye A, Lynch CA. Evaluation of Senegal supply chain intervention on contraceptive stockouts using routine stock data. PLoS One. 2020 Aug 3;15(8):e0236659. doi: 10.1371/journal.pone.0236659. PMID: 32745110; PMCID: PMC7398546.
 
-[3] Krug C, Cavallaro FL, Wong KLM, Gasparrini A, Faye A, Lynch CA. Evaluation of Senegal supply chain intervention on contraceptive stockouts using routine stock data. PLoS One. 2020 Aug 3;15(8):e0236659. doi: 10.1371/journal.pone.0236659. PMID: 32745110; PMCID: PMC7398546.
+[3] CITE SENEGAL DHS DATA
 
-[4] Cavallaro, F.L., Duclos, D., et al. Lessons learned from the evaluation of the Informed Push Model in Senegal. 2018 Mar. Reproductive Health Supplies Coalition meeting. Brussels. [Available at: https://www.rhsupplies.org/fileadmin/uploads/rhsc/General_Membership_Meetings/Brussels_2018/Presentations/Day_3/Parallel_Sessions/920/Lessons_learned_Informed_Push_Model_Senegal_-_Francesca_Cavallaro.pdf, Last accessed 5 November 2022].
-
-[5] Singh S, Darroch J, Ashford L. Adding it up: the costs and benefits of investing in sexual and reproductive health. New York: Guttmacher Institute and United Nations Population Fund; 2014 [Available at: https://www.unfpa.org/sites/default/files/pub-pdf/Adding%20It%20Up-Final-
+[4] Singh S, Darroch J, Ashford L. Adding it up: the costs and benefits of investing in sexual and reproductive health. New York: Guttmacher Institute and United Nations Population Fund; 2014 [Available at: https://www.unfpa.org/sites/default/files/pub-pdf/Adding%20It%20Up-Final-
 11.18.14.pdf, Last accessed 5 November 2022].
 
+# Appendix: Code, tables and graphs
 
-# Appendix
-
-Code used: 
-
+Code, tables and graphs
+```{r}
+#Installing packages
 library(haven)
 library(stringr)
 library(dplyr)
@@ -830,6 +789,7 @@ monthly_rate_all <- monthly_rate_all |> filter(month > 26 & month < 93)
 xaxis <- seq(as.Date("2010/1/1"), by = "month", length.out = 66) 
 monthly_rate_all$my <- vec_rep(rev(xaxis), 14)
 
+#Preparing data for graphing
 phase_1 <- c("Dakar")
 phase_2 <- c("Thies", "Kaolack")
 phase_3 <- c("Diourbel", "Kaffrine", "Fatick", "Matam")
@@ -844,8 +804,8 @@ monthly_rate_all <- monthly_rate_all |>
                          district %in% phase_4~"intervention district",
                          TRUE~"comparison district"))
 
-## Graphing
-g1 <- monthly_rate_all |> filter(district == "Dakar") |>
+## Graphing intervention districts alone
+monthly_rate_all |> filter(district == "Dakar") |>
   ggplot(aes(my, value))+
   geom_line(aes(group=district))+
   geom_smooth(aes(group = district),  
@@ -859,7 +819,7 @@ g1 <- monthly_rate_all |> filter(district == "Dakar") |>
   ggtitle("Dakar - June 2012")+
   theme(legend.position = "none")
 
-g2 <- monthly_rate_all |> filter(district == "Thies") |>
+monthly_rate_all |> filter(district == "Thies") |>
   ggplot(aes(my, value))+
   geom_line(aes(group=district))+
   geom_smooth(aes(group = district),  
@@ -873,7 +833,7 @@ g2 <- monthly_rate_all |> filter(district == "Thies") |>
   ggtitle("Thies - April 2013")+
   theme(legend.position = "none")
 
-g3 <- monthly_rate_all |> filter(district == "Kaolack") |>
+monthly_rate_all |> filter(district == "Kaolack") |>
   ggplot(aes(my, value))+
   geom_line(aes(group=district))+
   geom_smooth(aes(group = district),  
@@ -887,7 +847,7 @@ g3 <- monthly_rate_all |> filter(district == "Kaolack") |>
   ggtitle("Kaolack - April 2013")+
   theme(legend.position = "none")
 
-g4 <- monthly_rate_all |> filter(district == "Diourbel") |>
+monthly_rate_all |> filter(district == "Diourbel") |>
   ggplot(aes(my, value))+
   geom_line(aes(group=district))+
   geom_smooth(aes(group = district),  
@@ -901,7 +861,7 @@ g4 <- monthly_rate_all |> filter(district == "Diourbel") |>
   ggtitle("Diourbel - March 2014")+
   theme(legend.position = "none")
 
-g5 <- monthly_rate_all |> filter(district == "Kaffrine") |>
+monthly_rate_all |> filter(district == "Kaffrine") |>
   ggplot(aes(my, value))+
   geom_line(aes(group=district))+
   geom_smooth(aes(group = district),  
@@ -915,7 +875,7 @@ g5 <- monthly_rate_all |> filter(district == "Kaffrine") |>
   ggtitle("Kaffrine - March 2014")+
   theme(legend.position = "none")
 
-g6 <- monthly_rate_all |> filter(district == "Fatick") |>
+monthly_rate_all |> filter(district == "Fatick") |>
   ggplot(aes(my, value))+
   geom_line(aes(group=district))+
   geom_smooth(aes(group = district),  
@@ -929,7 +889,7 @@ g6 <- monthly_rate_all |> filter(district == "Fatick") |>
   ggtitle("Fatick - March 2014")+
   theme(legend.position = "none")
 
-g7 <- monthly_rate_all |> filter(district == "Matam") |>
+monthly_rate_all |> filter(district == "Matam") |>
   ggplot(aes(my, value))+
   geom_line(aes(group=district))+
   geom_smooth(aes(group = district),  
@@ -943,7 +903,7 @@ g7 <- monthly_rate_all |> filter(district == "Matam") |>
   ggtitle("Matam - March 2014")+
   theme(legend.position = "none")
 
-g8 <- monthly_rate_all |> filter(district == "Saint-Louis") |>
+monthly_rate_all |> filter(district == "Saint-Louis") |>
   ggplot(aes(my, value))+
   geom_line(aes(group=district))+
   geom_smooth(aes(group = district),  
@@ -957,7 +917,7 @@ g8 <- monthly_rate_all |> filter(district == "Saint-Louis") |>
   ggtitle("Saint-Louis - April 2014")+
   theme(legend.position = "none")
 
-g9 <- monthly_rate_all |> filter(district == "Louga") |>
+monthly_rate_all |> filter(district == "Louga") |>
   ggplot(aes(my, value))+
   geom_line(aes(group=district))+
   geom_smooth(aes(group = district),  
@@ -971,21 +931,9 @@ g9 <- monthly_rate_all |> filter(district == "Louga") |>
   ggtitle("Louga - July 2014")+
   theme(legend.position = "none")
 
-graph1 <- ggarrange(g1, g2, g3)
-graph1 <- annotate_figure(graph1, top = text_grob("Postpartum Modern Contraceptive Use in Intervention Districts"))
-
-graph2 <- ggarrange(g4, g5, g6)
-graph2 <- annotate_figure(graph2, top = text_grob("Postpartum Modern Contraceptive Use in Intervention Districts"))
-
-graph3 <- ggarrange(g7, g8, g9)
-graph3 <- annotate_figure(graph3, top = text_grob("Postpartum Modern Contraceptive Use in Intervention Districts"))
-
-graph1
-graph2
-graph3
 
 ## Graphing with comparison districts
-g10 <- monthly_rate_all |> filter(district == "Dakar" | district %in% comparison) |>
+monthly_rate_all |> filter(district == "Dakar" | district %in% comparison) |>
   ggplot(aes(my, value))+
   geom_smooth(aes(group = district, color=phase),  
               method = "loess", formula=y~x, se = FALSE) +
@@ -998,7 +946,7 @@ g10 <- monthly_rate_all |> filter(district == "Dakar" | district %in% comparison
   ggtitle("Dakar - June 2012")+
   theme(legend.position = "none")
 
-g11 <- monthly_rate_all |> filter(district == "Thies"| district %in% comparison) |>
+monthly_rate_all |> filter(district == "Thies"| district %in% comparison) |>
   ggplot(aes(my, value))+
   geom_smooth(aes(group = district, color=phase),  
               method = "loess", formula=y~x, se = FALSE) +
@@ -1011,7 +959,7 @@ g11 <- monthly_rate_all |> filter(district == "Thies"| district %in% comparison)
   ggtitle("Thies - April 2013")+
   theme(legend.position = "none")
 
-g12 <- monthly_rate_all |> filter(district == "Kaolack" | district %in% comparison) |>
+monthly_rate_all |> filter(district == "Kaolack" | district %in% comparison) |>
   ggplot(aes(my, value))+
   geom_smooth(aes(group = district, color=phase),  
               method = "loess", formula=y~x, se = FALSE) +
@@ -1024,7 +972,7 @@ g12 <- monthly_rate_all |> filter(district == "Kaolack" | district %in% comparis
   ggtitle("Kaolack - April 2013")+
   theme(legend.position = "none")
 
-g13 <- monthly_rate_all |> filter(district == "Diourbel" | district %in% comparison) |>
+monthly_rate_all |> filter(district == "Diourbel" | district %in% comparison) |>
   ggplot(aes(my, value))+
   geom_smooth(aes(group = district, color=phase),  
               method = "loess", formula=y~x, se = FALSE) +
@@ -1037,7 +985,7 @@ g13 <- monthly_rate_all |> filter(district == "Diourbel" | district %in% compari
   ggtitle("Diourbel - March 2014")+
   theme(legend.position = "none")
 
-g14 <- monthly_rate_all |> filter(district == "Kaffrine" | district %in% comparison) |>
+monthly_rate_all |> filter(district == "Kaffrine" | district %in% comparison) |>
   ggplot(aes(my, value))+
   geom_smooth(aes(group = district, color=phase),  
               method = "loess", formula=y~x, se = FALSE) +
@@ -1050,7 +998,7 @@ g14 <- monthly_rate_all |> filter(district == "Kaffrine" | district %in% compari
   ggtitle("Kaffrine - March 2014")+
   theme(legend.position = "none")
 
-g15 <- monthly_rate_all |> filter(district == "Fatick" | district %in% comparison) |>
+monthly_rate_all |> filter(district == "Fatick" | district %in% comparison) |>
   ggplot(aes(my, value))+
   geom_smooth(aes(group = district, color=phase),  
               method = "loess", formula=y~x, se = FALSE) +
@@ -1063,7 +1011,7 @@ g15 <- monthly_rate_all |> filter(district == "Fatick" | district %in% compariso
   ggtitle("Fatick - March 2014")+
   theme(legend.position = "none")
 
-g16 <- monthly_rate_all |> filter(district == "Matam" | district %in% comparison) |>
+monthly_rate_all |> filter(district == "Matam" | district %in% comparison) |>
   ggplot(aes(my, value))+
   geom_smooth(aes(group = district, color=phase),  
               method = "loess", formula=y~x, se = FALSE) +
@@ -1076,7 +1024,7 @@ g16 <- monthly_rate_all |> filter(district == "Matam" | district %in% comparison
   ggtitle("Matam - March 2014")+
   theme(legend.position = "none")
 
-g17 <- monthly_rate_all |> filter(district == "Saint-Louis" | district %in% comparison) |>
+monthly_rate_all |> filter(district == "Saint-Louis" | district %in% comparison) |>
   ggplot(aes(my, value))+
   geom_smooth(aes(group = district, color=phase),  
               method = "loess", formula=y~x, se = FALSE) +
@@ -1089,7 +1037,7 @@ g17 <- monthly_rate_all |> filter(district == "Saint-Louis" | district %in% comp
   ggtitle("Saint-Louis - April 2014")+
   theme(legend.position = "none")
 
-g18 <- monthly_rate_all |> filter(district == "Louga" | district %in% comparison) |>
+monthly_rate_all |> filter(district == "Louga" | district %in% comparison) |>
   ggplot(aes(my, value))+
   geom_smooth(aes(group = district, color=phase),  
               method = "loess", formula=y~x, se = FALSE) +
@@ -1101,17 +1049,4 @@ g18 <- monthly_rate_all |> filter(district == "Louga" | district %in% comparison
   theme(axis.text.x=element_text(angle=60, hjust=1, size = 5))+
   ggtitle("Louga - July 2014")+
   theme(legend.position = "none")
-
-
-graph4 <- ggarrange(g10, g11, g12)
-graph4 <- annotate_figure(graph4, top = text_grob("Postpartum Modern Contraceptive Use in Intervention Districts (blue)"))
-
-graph5 <- ggarrange(g13, g14, g15)
-graph5 <- annotate_figure(graph5, top = text_grob("Postpartum Modern Contraceptive Use in Intervention Districts (blue)"))
-
-graph6 <- ggarrange(g16, g17, g18)
-graph6 <- annotate_figure(graph6, top = text_grob("Postpartum Modern Contraceptive Use in Intervention Districts (blue)"))
-
-graph4
-graph5
-graph6
+```
